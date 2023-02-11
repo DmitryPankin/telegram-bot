@@ -10,8 +10,6 @@ def out_history(response_database_in: Any, user_id_in: str) -> List:
     """
     count = 1
     out_total = []
-    if len(response_database_in) > 5:
-        response_database_in = response_database_in[:5]
     for element in response_database_in:
         if element.user_id == user_id_in:
             out_total.append(
@@ -20,4 +18,4 @@ def out_history(response_database_in: Any, user_id_in: str) -> List:
                 f' {element.request}'
             )
             count += 1
-    return out_total
+    return out_total[-5:]

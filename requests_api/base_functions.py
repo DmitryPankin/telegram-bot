@@ -63,7 +63,7 @@ def get_city_hotels_photo(city_in: str, number_in: int, photos_in=0) -> str:
 
     querystring_1 = {"q": str(city_in), "locale": "ru_RU"}
 
-    response_city = requests.request("GET", url_city, headers=headers_1, params=querystring_1)
+    response_city = requests.request("GET", url_city, headers=headers_1, params=querystring_1, timeout=15)
     res_city = response_city.json()
     if 'gaiaId' not in res_city['sr'][0]:
         return f'Ошибка запроса...\n ' \
@@ -73,7 +73,7 @@ def get_city_hotels_photo(city_in: str, number_in: int, photos_in=0) -> str:
     region_id = res_city['sr'][0]['gaiaId']
     payload_1['destination']['regionId'] = region_id
 
-    response_hotels = requests.request("POST", url_hotels, json=payload_1, headers=headers_2)
+    response_hotels = requests.request("POST", url_hotels, json=payload_1, headers=headers_2, timeout=30)
     res_hotels = response_hotels.json()
     if 'errors' in res_hotels:
         return f'Похоже, по городу нет данных...\n ' \
@@ -83,7 +83,7 @@ def get_city_hotels_photo(city_in: str, number_in: int, photos_in=0) -> str:
         result[number['id']] = number['name'] + '**\n цена: ' + number['price']['lead']['formatted'] + ' за ночь'
         result_price[number['id']] = int(number['price']['lead']['formatted'][1:])
         payload_2['propertyId'] = number['id']
-        response_photo = requests.request("POST", url_photos, headers=headers_2, json=payload_2)
+        response_photo = requests.request("POST", url_photos, headers=headers_2, json=payload_2, timeout=30)
         res_photo = response_photo.json()
         result_photos[number['id']] = []
         result_distance[number['id']] = round(number['destinationInfo']['distanceFromDestination']['value'] * 1.61, 2)
