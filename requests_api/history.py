@@ -10,7 +10,9 @@ def out_history(response_database_in: Any, user_id_in: str) -> List:
     """
     count = 1
     out_total = []
-    for element in response_database_in[-5:]:
+    if len(response_database_in) > 5:
+        response_database_in = response_database_in[:5]
+    for element in response_database_in:
         if element.user_id == user_id_in:
             out_total.append(
                 f'{element.created_request}\n'
