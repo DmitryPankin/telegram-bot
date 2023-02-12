@@ -32,7 +32,7 @@ def get_commands(message) -> None:
         result_out = history.out_history(response_database, user_id)
 
         for result_next in result_out:
-            bot.send_message(message.from_user.id, f"Ваша история: \n{result_next}!", reply_markup=None)
+            bot.send_message(message.from_user.id, f"Ваша история: \n{result_next}", reply_markup=None)
         bot.send_message(message.from_user.id, "Хочешь ещё? Выбери и нажми кнопку!' ", reply_markup=None)
 
     elif command == '/highprice':
@@ -58,12 +58,12 @@ def get_hotels(message) -> None:
 
 def get_photos(message) -> None:
     """Запрос необходимости вывода фото"""
-    if message.text.isdigit() and int(message.text) <= 10:
+    if message.text.isdigit() and int(message.text) < 10:
         result[message.from_user.id].append(message.text + ' hotels')
         photos = bot.send_message(message.from_user.id, 'Фото показать? ДА/нет', reply_markup=None)
         bot.register_next_step_handler(photos, get_numbers_photos)
     else:
-        bot.send_message(message.from_user.id, 'Это не цифра...\nНачнём заново?!)))..Цифра не > 10', reply_markup=None)
+        bot.send_message(message.from_user.id, 'Это не цифра...\nНачнём заново?!)))..Цифра не > 9', reply_markup=None)
         get_city(message)
 
 
@@ -71,23 +71,23 @@ def get_numbers_photos(message) -> None:
     """Запрос количества фото"""
     if message.text.lower() == 'да':
         photos_numbers = bot.send_message(message.from_user.id, 'Сколько фото показать?', reply_markup=None)
-        bot.register_next_step_handler(photos_numbers, digit_to_10)
+        bot.register_next_step_handler(photos_numbers, digit_to_5)
     else:
         out_res(message)
 
 
-def digit_to_10(message) -> None:
-    """ Проверка количества фото (не более 10)"""
-    if int(message.text) > 10:
-        digit = bot.send_message(message.from_user.id, ' не > 10...повторите ввод', reply_markup=None)
-        bot.register_next_step_handler(digit, digit_to_10)
+def digit_to_5(message) -> None:
+    """ Проверка количества фото (не более 5)"""
+    if int(message.text) > 5:
+        digit = bot.send_message(message.from_user.id, ' не > 5...повторите ввод', reply_markup=None)
+        bot.register_next_step_handler(digit, digit_to_5)
     else:
         out_res(message)
 
 
 def out_res(message) -> None:
     """Поиск информации и вывод результата пользователю"""
-    if message.text.isdigit():
+    if message.text.isdigit() and int(message.text) <= 5:
         message.text = f'{message.text} фото'
     else:
         message.text = 'без фото'
@@ -106,7 +106,8 @@ def out_res(message) -> None:
             photos = int(result[message.from_user.id][2][:1])
             out_total = base_functions.get_city_hotels_photo(city, number, photos)
 
-        bot.send_message(message.from_user.id, f'{out_total}')
+        for out_next in out_total.split(']')[:-1]:
+            bot.send_message(message.from_user.id, f'{out_next}')
         write_history(
             db, History, [
                 {'user_id': str(message.from_user.id), 'request': out_total}
